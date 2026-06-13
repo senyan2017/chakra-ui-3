@@ -1,6 +1,6 @@
 "use client"
 
-import { chakra } from "@chakra-ui/react"
+import { chakra, Stack, Text } from "@chakra-ui/react"
 
 export const PlaygroundTable = chakra("table", {
   base: {
@@ -21,3 +21,51 @@ export const PlaygroundTable = chakra("table", {
     },
   },
 })
+
+export interface PlaygroundTableContainerProps {
+  /** Optional title rendered above the table */
+  title?: React.ReactNode
+  /** Optional description rendered below the title */
+  description?: React.ReactNode
+  children: React.ReactNode
+}
+
+/**
+ * A lightweight wrapper around `PlaygroundTable` that provides an optional
+ * title and description, so individual examples don't have to add their own
+ * heading JSX every time.
+ *
+ * Usage:
+ * ```tsx
+ * <PlaygroundTableContainer title="Button Sizes">
+ *   <PlaygroundTable>
+ *     ...
+ *   </PlaygroundTable>
+ * </PlaygroundTableContainer>
+ * ```
+ */
+export const PlaygroundTableContainer = ({
+  title,
+  description,
+  children,
+}: PlaygroundTableContainerProps) => {
+  const hasHeader = title || description
+  if (!hasHeader) return <>{children}</>
+  return (
+    <Stack gap="2" mb="4">
+      <Stack gap="1">
+        {title && (
+          <Text fontWeight="semibold" fontSize="sm">
+            {title}
+          </Text>
+        )}
+        {description && (
+          <Text fontSize="xs" color="fg.muted">
+            {description}
+          </Text>
+        )}
+      </Stack>
+      {children}
+    </Stack>
+  )
+}
