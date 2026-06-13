@@ -1,0 +1,19 @@
+packages:
+  - packages/**/**
+  - sandbox/**
+  - apps/**
+
+overrides:
+  react: 19.2.6
+  react-dom: 19.2.6
+  immer: ">=11.0.1"
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
