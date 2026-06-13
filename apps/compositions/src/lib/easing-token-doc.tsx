@@ -1,12 +1,10 @@
 "use client"
 
-import { Box, SimpleGrid, Stack, Text, defaultSystem } from "@chakra-ui/react"
+import { Box, SimpleGrid, Stack, Text } from "@chakra-ui/react"
 import { TokenDoc } from "./token-doc"
+import { getCategoryTokens } from "./token-doc-helpers"
 
-const { tokens } = defaultSystem
-
-const easings = tokens.categoryMap.get("easings")!
-const allEasings = Array.from(easings.values())
+const allEasings = getCategoryTokens("easings")
 
 export const EasingTokenDoc = () => {
   return (

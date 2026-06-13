@@ -6,14 +6,11 @@ import {
   Stack,
   Text,
   VStack,
-  defaultSystem,
 } from "@chakra-ui/react"
 import { TokenDoc } from "./token-doc"
+import { getCategoryTokens } from "./token-doc-helpers"
 
-const { tokens } = defaultSystem
-
-const aspectRatios = tokens.categoryMap.get("aspectRatios")!
-const allAspectRatios = Array.from(aspectRatios.values())
+const allAspectRatios = getCategoryTokens("aspectRatios")
 
 export const AspectRatioTokenDoc = () => {
   return (
