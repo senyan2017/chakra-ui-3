@@ -1,41 +1,30 @@
 "use client"
 
-import { Flex, Stack, Text, defaultSystem } from "@chakra-ui/react"
 import { TokenDoc } from "./token-doc"
+import { TokenTable, type TokenTableColumn } from "./token-table"
+import { getCategoryTokens } from "./token-helpers"
 
-const { tokens } = defaultSystem
+export const defaultZIndex = getCategoryTokens("zIndex", {
+  sort: (a, b) => parseFloat(a.originalValue) - parseFloat(b.originalValue),
+})
 
-const allZIndex = tokens.categoryMap.get("zIndex")!.values()
-export const defaultZIndex = Array.from(allZIndex).sort(
-  (a, b) => parseFloat(a.originalValue) - parseFloat(b.originalValue),
-)
+const columns: TokenTableColumn[] = [
+  {
+    label: "Name",
+    width: "100px",
+    getValue: (token) => token.extensions.prop,
+  },
+  {
+    label: "Value",
+    width: "100px",
+    getValue: (token) => token.originalValue,
+  },
+]
 
 export const ZIndexTokenDoc = () => {
   return (
     <TokenDoc title="theme.tokens.zIndex" mt="8">
-      <Flex
-        fontSize="sm"
-        fontWeight="medium"
-        py="1"
-        px="3"
-        borderBottomWidth="1px"
-      >
-        <Text width="100px">Name</Text>
-        <Text width="100px">Value</Text>
-      </Flex>
-
-      <Stack px="3" pt="2">
-        {defaultZIndex.map((token) => (
-          <Flex key={token.name} py="1" fontSize="sm">
-            <Text width="100px" fontWeight="medium">
-              {token.extensions.prop}
-            </Text>
-            <Text width="100px" color="fg.muted">
-              {token.originalValue}
-            </Text>
-          </Flex>
-        ))}
-      </Stack>
+      <TokenTable columns={columns} tokens={defaultZIndex} />
     </TokenDoc>
   )
 }

@@ -1,26 +1,25 @@
 "use client"
 
-import { Box, Flex, For, Stack, Text, defaultSystem } from "@chakra-ui/react"
+import { Box, For, Stack } from "@chakra-ui/react"
 import { TokenDoc } from "./token-doc"
+import { TokenTable, type TokenTableColumn } from "./token-table"
+import { getCategoryTokens } from "./token-helpers"
 
-const { tokens } = defaultSystem
+const allSizes = getCategoryTokens("sizes")
 
-const allSizes = tokens.categoryMap.get("sizes")!.values()
-export const defaultSizes = Array.from(allSizes)
-
-const fractionalSizes = defaultSizes.filter((token) => token.name.includes("/"))
-const namedSizes = defaultSizes.filter((token) =>
+const fractionalSizes = allSizes.filter((token) => token.name.includes("/"))
+const namedSizes = allSizes.filter((token) =>
   token.name.match(/v(h|w)|min|max|fit|prose|full/),
 )
-const breakpointSizes = defaultSizes.filter((token) =>
+const breakpointSizes = allSizes.filter((token) =>
   token.name.match(/breakpoint/),
 )
-const largeSizes = defaultSizes.filter(
+const largeSizes = allSizes.filter(
   (token) =>
     token.name.match(/sm|xl|xs|lg|md/) && !breakpointSizes.includes(token),
 )
 
-const tokenSizes = defaultSizes
+const tokenSizes = allSizes
   .filter(
     (token) =>
       !fractionalSizes.includes(token) &&
@@ -33,56 +32,58 @@ const tokenSizes = defaultSizes
       parseInt(a.extensions.pixelValue!) - parseInt(b.extensions.pixelValue!),
   )
 
+const baseColumns: TokenTableColumn[] = [
+  {
+    label: "Name",
+    width: "160px",
+    getValue: (token) => token.extensions.prop,
+  },
+  {
+    label: "Value",
+    width: "100px",
+    getValue: (token) => token.value,
+  },
+]
+
+const pixelColumn: TokenTableColumn = {
+  label: "Pixel",
+  width: "100px",
+  getValue: (token) => token.extensions.pixelValue,
+}
+
+const groups = [
+  { name: "tokenSizes", tokens: tokenSizes, withPixel: true },
+  { name: "namedSizes", tokens: namedSizes, withPixel: false },
+  { name: "fractionalSizes", tokens: fractionalSizes, withPixel: false },
+  { name: "breakpointSizes", tokens: breakpointSizes, withPixel: false },
+  { name: "largeSizes", tokens: largeSizes, withPixel: false },
+]
+
 export const SizesTokenDoc = () => {
   return (
     <Stack mt="8" gap="8">
-      <For
-        each={[
-          { name: "tokenSizes", tokens: tokenSizes },
-          { name: "namedSizes", tokens: namedSizes },
-          { name: "fractionalSizes", tokens: fractionalSizes },
-          { name: "breakpointSizes", tokens: breakpointSizes },
-          { name: "largeSizes", tokens: largeSizes },
-        ]}
-      >
-        {(item) => (
-          <TokenDoc title={item.name}>
-            <Flex
-              fontSize="sm"
-              fontWeight="medium"
-              py="1"
-              px="3"
-              borderBottomWidth="1px"
-            >
-              <Text width="160px">Name</Text>
-              <Text width="100px">Value</Text>
-              {item.name === "tokenSizes" && <Text width="100px">Pixel</Text>}
-            </Flex>
-
-            <Stack px="3" pt="2">
-              {item.tokens.map((token) => (
-                <Flex key={token.name} py="1" fontSize="sm">
-                  <Text width="160px" fontWeight="medium">
-                    {token.extensions.prop}
-                  </Text>
-                  <Text width="100px" color="fg.muted">
-                    {token.value}
-                  </Text>
-                  {item.name === "tokenSizes" && (
-                    <Text width="100px" color="fg.muted">
-                      {token.extensions.pixelValue}
-                    </Text>
-                  )}
-                  {item.name === "tokenSizes" && (
-                    <Box
-                      bg="pink.200"
-                      height="4"
-                      width={`min(${token.originalValue}, 60%)`}
-                    />
-                  )}
-                </Flex>
-              ))}
-            </Stack>
+      <For each={groups}>
+        {(group) => (
+          <TokenDoc title={group.name}>
+            <TokenTable
+              columns={
+                group.withPixel
+                  ? [...baseColumns, pixelColumn]
+                  : baseColumns
+              }
+              tokens={group.tokens}
+              renderPreview={
+                group.withPixel
+                  ? (token) => (
+                      <Box
+                        bg="pink.200"
+                        height="4"
+                        width={`min(${token.originalValue}, 60%)`}
+                      />
+                    )
+                  : undefined
+              }
+            />
           </TokenDoc>
         )}
       </For>
